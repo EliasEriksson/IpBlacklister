@@ -8,3 +8,5 @@ Run `ip_blacklister.py` for a single run through or run `autorun_ip_blacklister.
 Requires python to be run as sudo due to the use of UFW.
 
 If you use other firewall software or want lesser/tougher evaluation of each ip you can modify `ban()` and `evaluate_ip()` to fit your neeeds.
+
+Requires python 3.6+ at least, developed under python 3.7.
