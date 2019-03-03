@@ -11,7 +11,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 def log(message: str, file="ip_blacklister.log"):
     file = os.path.join(PROJECT_ROOT, file)
     with open(file, "a") as f:
-        f.write(message)
+        f.write(message + "\n")
 
 
 def run():
@@ -28,6 +28,6 @@ if __name__ == '__main__':
                       hour=12,
                       misfire_grace_time=3600,
                       name=f"scan @ {datetime.datetime.now()}")
-    log("Started ip blacklister")
+    log("\nStarted ip blacklister")
     log("ip blacklister will scan access.log at 12:00 local time")
     scheduler.start()
