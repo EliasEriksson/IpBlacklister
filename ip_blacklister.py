@@ -10,6 +10,12 @@ from yarl import URL
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
+def log(message: str, file="ip_blacklister.log") -> None:
+    file = os.path.join(PROJECT_ROOT, file)
+    with open(file, "a") as f:
+        f.write(message + "\n")
+
+
 def get_api() -> str:
     """
     returns the api key from the settings.json file
@@ -185,7 +191,7 @@ def ban(ip: str) -> None:
     :return: None
     """
     os.system(f"ufw deny from {ip} to any")
-    print(f"Banned {ip} date: {datetime.date.today()}")
+    log(f"Banned {ip} date: {datetime.date.today()}")
 
 
 async def main() -> None:
