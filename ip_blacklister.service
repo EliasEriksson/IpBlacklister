@@ -1,0 +1,9 @@
+[Unit]
+Description=Ip Blacklister
+After=multi-user.target
+
+[Service]
+ExecStart=PATH/TO/PYTHON PATH/TO/autorun_blacklister.py
+
+[Install]
+WantedBy=multi-user.target
