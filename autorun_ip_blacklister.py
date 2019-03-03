@@ -1,14 +1,14 @@
-import asyncio
 from ip_blacklister import main
-from apscheduler.schedulers.blocking import BlockingScheduler
-import datetime
 import os
+import asyncio
+import datetime
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
-def log(message: str, file="ip_blacklister.log"):
+def log(message: str, file="ip_blacklister.log") -> None:
     file = os.path.join(PROJECT_ROOT, file)
     with open(file, "a") as f:
         f.write(message + "\n")
@@ -28,6 +28,6 @@ if __name__ == '__main__':
                       hour=12,
                       misfire_grace_time=3600,
                       name=f"scan @ {datetime.datetime.now()}")
-    log("\nStarted ip blacklister")
+    log(f"\nStarted ip blacklister @ {datetime.datetime.now()}")
     log("ip blacklister will scan access.log at 12:00 local time")
     scheduler.start()
