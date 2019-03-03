@@ -7,6 +7,8 @@ import aiohttp
 import aiosqlite
 from yarl import URL
 
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 
 def get_api() -> str:
     """
@@ -14,7 +16,8 @@ def get_api() -> str:
 
     :return: str, abuseipdb api key
     """
-    with open("settings.json", "r") as f:
+    file = os.path.join(PROJECT_ROOT, "settings.json")
+    with open(file, "r") as f:
         data = json.load(f)
         return data["api"]
 
@@ -25,7 +28,8 @@ def get_access_log() -> str:
 
     :return: str, apache2 log filepath
     """
-    with open("settings.json", "r") as f:
+    file = os.path.join(PROJECT_ROOT, "settings.json")
+    with open(file, "r") as f:
         data = json.load(f)
         return data["access_log"]
 
@@ -54,6 +58,7 @@ async def get_all_old_ips(db="db.db") -> set:
     :param db: str, sqlite db file
     :return: set, ip addresses older than 30 days
     """
+    db = os.path.join(PROJECT_ROOT, db)
     async with aiosqlite.connect(db) as connection:
         cursor = await connection.cursor()
         sql = "select ip from iptable " \
@@ -69,6 +74,7 @@ async def get_all_recent_ips(db="db.db") -> set:
     :param db: str, sqlite db file
     :return: set, ip adresses newer than 30 days
     """
+    db = os.path.join(PROJECT_ROOT, db)
     async with aiosqlite.connect(db) as connection:
         cursor = await connection.cursor()
         sql = "select ip from iptable " \
@@ -123,6 +129,7 @@ async def store_ips(*ips: str, db="db.db") -> None:
     :param db: str, sqlite database name
     :return: None
     """
+    db = os.path.join(PROJECT_ROOT, db)
     async with aiosqlite.connect(db) as connecton:
         cursor = await connecton.cursor()
         for ip in ips:
@@ -144,6 +151,7 @@ async def update_ips(*ips: str, db="db.db") -> None:
     :param db: str, sqlite database filepath
     :return: None
     """
+    db = os.path.join(PROJECT_ROOT, db)
     async with aiosqlite.connect(db) as connection:
         cursor = await connection.cursor()
         today = datetime.date.today()
