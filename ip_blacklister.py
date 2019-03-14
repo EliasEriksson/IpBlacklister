@@ -124,7 +124,7 @@ async def check_ips(*ips: str, max_age="30", api: str) -> list:
                 f"{base_url}?ipAddress={URL(ip)}&maxAgeInDays={URL(max_age)}",
                 session)))
 
-        return [(await task)["data"] for task in tasks]
+        return [result["data"] for result in [(await task) for task in tasks] if result]
 
 
 async def store_ips(*ips: str, db="db.db") -> None:
