@@ -1,7 +1,7 @@
 # IpBlacklister
 Scans an apache access.log file and evaluates if ip adresses should be blacklisted in UFW firewall with help of abuseipdb.
 
-Add you abuseipdb api key in settings.json, and modefy the acces.log filepath if its located elsewhere. 
+Add you abuseipdb api key in settings.json, and modify the access.log filepath if it's located elsewhere. 
 
 Run `ip_blacklister.py` for a single run through or run `autorun_ip_blacklister.py` for a access.log scan every 24h at 12:00 local time. Run `make_database.py` before atempting to run IpBlacklister.
 
