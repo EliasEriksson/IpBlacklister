@@ -1,4 +1,13 @@
 {
   "api": "",
-  "access_log": "/var/log/apache2/access.log"
+  "logs": [
+    "/var/log/apache2/access.log",
+    "/var/log/auth.log"
+  ],
+  "mode": "schedule",
+  "modes": [
+    "single_run",
+    "watchdog",
+    "schedule"
+  ]
 }
