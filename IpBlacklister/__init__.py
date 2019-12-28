@@ -5,6 +5,7 @@ from pathlib import Path, PosixPath
 # TODO clean up run / settings
 # TODO rework logging to use the logger module
 # TODO parse access.log for webdrivers etc + frequency of requests as well as check abuseipdb for better confidence
+# TODO update readme
 
 PROJECT_ROOT: PosixPath = Path(__file__).parent.parent
 
