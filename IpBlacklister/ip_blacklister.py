@@ -1,60 +1,49 @@
+from . import PROJECT_ROOT
+from typing import Dict, Any
+import datetime
 import asyncio
+import json
 import os
 import re
-import json
-import datetime
 import aiohttp
 import aiosqlite
 from yarl import URL
 
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-
 
 def log(message: str, file="ip_blacklister.log") -> None:
-    file = os.path.join(PROJECT_ROOT, file)
-    with open(file, "a") as f:
-        f.write(message + "\n")
+    with PROJECT_ROOT.joinpath(file).open("a") as f:
+        f.write("\n" + message)
 
 
-def get_api() -> str:
-    """
-    returns the api key from the settings.json file
-
-    :return: str, abuseipdb api key
-    """
-    file = os.path.join(PROJECT_ROOT, "settings.json")
-    with open(file, "r") as f:
-        data = json.load(f)
-        return data["api"]
+def get_settings(*fields: str) -> Dict[str, Any]:
+    with PROJECT_ROOT.joinpath("settings.json").open() as f:
+        data: dict = json.load(f)
+    if fields:
+        return {field: data[field] for field in fields}
+    else:
+        return data
 
 
-def get_access_log() -> str:
-    """
-    returns the access log filepath from the settings.json file
-
-    :return: str, apache2 log filepath
-    """
-    file = os.path.join(PROJECT_ROOT, "settings.json")
-    with open(file, "r") as f:
-        data = json.load(f)
-        return data["access_log"]
-
-
-def read_access_log(location: str) -> set:
+def read_log(*locations: str) -> set:
     """
     reads the access log and searches for ip adresses
 
-    :param location: str, apache2 log filepath
+    :param locations: str, apache2 log filepath
     :return: set, ip adresses
     """
     ip_pattern = re.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
-    with open(location) as file:
-        ips = set()
-        for line in file:
-            match = ip_pattern.findall(line)
-            if match:
-                ips.update(match)
-        return ips
+    ips = set()
+    for location in locations:
+        try:
+            with open(location) as file:
+                for line in file:
+                    match = ip_pattern.findall(line)
+                    if match:
+                        ips.update(match)
+        except FileNotFoundError:
+            log(f"File `{location}` does not exist.")
+
+    return ips
 
 
 async def get_all_old_ips(db="db.db") -> set:
@@ -64,7 +53,7 @@ async def get_all_old_ips(db="db.db") -> set:
     :param db: str, sqlite db file
     :return: set, ip addresses older than 30 days
     """
-    db = os.path.join(PROJECT_ROOT, db)
+    db = str(PROJECT_ROOT.joinpath(db))
     async with aiosqlite.connect(db) as connection:
         cursor = await connection.cursor()
         sql = "select ip from iptable " \
@@ -80,7 +69,7 @@ async def get_all_recent_ips(db="db.db") -> set:
     :param db: str, sqlite db file
     :return: set, ip adresses newer than 30 days
     """
-    db = os.path.join(PROJECT_ROOT, db)
+    db = str(PROJECT_ROOT.joinpath(db))
     async with aiosqlite.connect(db) as connection:
         cursor = await connection.cursor()
         sql = "select ip from iptable " \
@@ -135,7 +124,7 @@ async def store_ips(*ips: str, db="db.db") -> None:
     :param db: str, sqlite database name
     :return: None
     """
-    db = os.path.join(PROJECT_ROOT, db)
+    db = str(PROJECT_ROOT.joinpath(db))
     async with aiosqlite.connect(db) as connecton:
         cursor = await connecton.cursor()
         for ip in ips:
@@ -157,7 +146,7 @@ async def update_ips(*ips: str, db="db.db") -> None:
     :param db: str, sqlite database filepath
     :return: None
     """
-    db = os.path.join(PROJECT_ROOT, db)
+    db = str(PROJECT_ROOT.joinpath(db))
     async with aiosqlite.connect(db) as connection:
         cursor = await connection.cursor()
         today = datetime.date.today()
@@ -194,21 +183,22 @@ def ban(ip: str) -> None:
     log(f"Banned {ip} date: {datetime.date.today()}")
 
 
-async def main() -> None:
-    api = get_api()
-    access_log = get_access_log()
+async def main(settings: Dict[str, Any]) -> None:
+    log(f"\nip blacklister starting to scan loggs @ {datetime.datetime.now()}")
 
-    log_ips = read_access_log(access_log)
+    log_ips = read_log(*settings["logs"])
+
     recent_ips = await get_all_recent_ips()
     old_ips = await get_all_old_ips()
 
-    data = await check_ips(*log_ips.difference(recent_ips).union(old_ips), api=api)
+    data = await check_ips(*log_ips.difference(recent_ips).union(old_ips), api=settings["api"])
     evaluate_ip_ban(data)
 
     await store_ips(*log_ips.difference(old_ips).difference(recent_ips))
     await update_ips(*old_ips)
+    log(f"ip blacklister scanned loggs @ {datetime.datetime.now()}")
 
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    loop.run_until_complete(main(get_settings()))
