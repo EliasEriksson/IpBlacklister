@@ -64,12 +64,14 @@ def run() -> None:
     settings: Dict[str, Any] = get_settings()
     if settings["mode"] == "watchdog":
         _run_with_watchdog(settings)
+
     elif settings["mode"] == "schedule":
         _run_with_schedule(settings)
 
     elif settings["mode"] == "single_run":
         loop = asyncio.get_event_loop()
         loop.run_until_complete(main(settings))
+
     else:
         raise NoSuchMode(settings["modes"])
 

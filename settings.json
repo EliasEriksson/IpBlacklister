@@ -4,7 +4,7 @@
     "/var/log/apache2/access.log",
     "/var/log/auth.log"
   ],
-  "mode": "schedule",
+  "mode": "watchdog",
   "modes": [
     "single_run",
     "watchdog",

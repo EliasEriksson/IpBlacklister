@@ -6,6 +6,7 @@ from pathlib import Path, PosixPath
 # TODO rework logging to use the logger module
 # TODO parse access.log for webdrivers etc + frequency of requests as well as check abuseipdb for better confidence
 # TODO update readme
+# TODO evaluate recent ips if they should be unbanned
 
 PROJECT_ROOT: PosixPath = Path(__file__).parent.parent
 

@@ -31,6 +31,8 @@ def read_log(*locations: str) -> set:
     :param locations: str, apache2 log filepath
     :return: set, ip adresses
     """
+
+    # TODO rework to only read the last few lines of a file
     ip_pattern = re.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
     ips = set()
     for location in locations:
